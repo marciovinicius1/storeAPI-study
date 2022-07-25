@@ -1,0 +1,7 @@
+{
+  "package": "./package.json",
+  "reporter": "spec",
+  "slow": "5000",
+  "watch-files": ["lib/**/*.js", "test/**/*.js"],
+  "file": "test/unit/helpers.js"
+}
