@@ -2,6 +2,12 @@ import UsersController from "../../../src/controllers/users.js";
 import sinon from "sinon";
 import User from "../../../src/models/user.js";
 
+import AuthService from "../../../src/services/auth.js";
+
+import jwt from "jsonwebtoken";
+import config from "config";
+import bcrypt from "bcrypt";
+
 describe("Controller: Users", () => {
   const defaultUser = [
     {
@@ -252,6 +258,98 @@ describe("Controller: Users", () => {
         await usersController.remove(request, response);
         sinon.assert.calledWith(response.send, "Error");
       });
+    });
+  });
+
+  describe("authenticate", () => {
+    it("should authenticate a user", async () => {
+      const fakeUserModel = {};
+      const user = {
+        name: "Elon Musk",
+        email: "elon@gmail.com",
+        password: "12345",
+        role: "admin",
+      };
+      const userWithEncryptedPassword = {
+        ...user,
+        password: bcrypt.hashSync(user.password, 10),
+      };
+
+      const jwtToken = jwt.sign(
+        userWithEncryptedPassword,
+        config.get("auth.key"),
+        {
+          expiresIn: config.get("auth.tokenExpiresIn"),
+        }
+      );
+
+      class FakeAuthService {
+        authenticate() {
+          return Promise.resolve(userWithEncryptedPassword);
+        }
+        static generateToken() {
+          return jwtToken;
+        }
+      }
+
+      const fakeReq = {
+        body: user,
+      };
+      const fakeRes = {
+        send: sinon.spy(),
+      };
+      const usersController = new UsersController(
+        fakeUserModel,
+        FakeAuthService
+      );
+      await usersController.authenticate(fakeReq, fakeRes);
+      sinon.assert.calledWith(fakeRes.send, { token: jwtToken });
+    });
+
+    it("should return 401 when the user can not be found", async () => {
+      const fakeUserModel = {};
+      class FakeAuthService {
+        authenticate() {
+          return Promise.resolve(false);
+        }
+      }
+      const user = {
+        name: "Elon Musk",
+        email: "elon@gamil.com",
+        password: "12345",
+        role: "admin",
+      };
+      const fakeReq = {
+        body: user,
+      };
+      const fakeRes = {
+        sendStatus: sinon.spy(),
+      };
+      const usersController = new UsersController(
+        fakeUserModel,
+        FakeAuthService
+      );
+
+      await usersController.authenticate(fakeReq, fakeRes);
+      sinon.assert.calledWith(fakeRes.sendStatus, 401);
+    });
+
+    it("should return false when the password does not match", async () => {
+      const user = {
+        email: "elon@gamil.com",
+        password: "12345",
+      };
+      const fakeUserModel = {
+        findOne: sinon.stub(),
+      };
+      fakeUserModel.findOne.withArgs({
+        email: user.email,
+        password: "aFakeHashPassword",
+      });
+      const authService = new AuthService(fakeUserModel);
+      const response = await authService.authenticate(user);
+
+      expect(response).to.be.false;
     });
   });
 });

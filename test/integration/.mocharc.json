@@ -1,6 +1,7 @@
 {
   "package": "./package.json",
-  "timeout": "5000",
+  "reporter": "spec",
+  "slow": "5000",
   "watch-files": ["lib/**/*.js", "test/**/*.js"],
   "file": ["test/integration/helpers.js", "test/integration/global.js"]
 }

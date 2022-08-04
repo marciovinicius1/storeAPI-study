@@ -1,0 +1,9 @@
+{
+  "database": {
+    "mongoUrl": "mongodb://localhost:27017/shop"
+  },
+  "auth": {
+    "key": "marcioviniciusapisecurekey",
+    "tokenExpiresIn": "7d"
+  }
+}

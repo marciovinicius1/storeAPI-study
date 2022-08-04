@@ -1,5 +1,5 @@
 import User from "../../../src/models/user.js";
-import { expect } from "chai";
+import AuthService from "../../../src/services/auth.js";
 
 describe("Routes: Users", () => {
   const defaultId = "56cb91bdc3464f14678934ca";
@@ -16,6 +16,8 @@ describe("Routes: Users", () => {
     role: "admin",
   };
 
+  const authToken = AuthService.generateToken(expectAdminUser);
+
   beforeEach(async () => {
     const user = new User(defaultAdmin);
     user._id = "56cb91bdc3464f14678934ca";
@@ -27,19 +29,25 @@ describe("Routes: Users", () => {
 
   describe("GET /users", () => {
     it("should return a list of users", (done) => {
-      request.get("/users").end((err, res) => {
-        expect(res.body).to.eql([expectAdminUser]);
-        done(err);
-      });
+      request
+        .get("/users")
+        .set({ "x-access-token": authToken })
+        .end((err, res) => {
+          expect(res.body).to.eql([expectAdminUser]);
+          done(err);
+        });
     });
 
     context("when an id is specified ", (done) => {
       it("should return 200 with one user", (done) => {
-        request.get(`/users/${defaultId}`).end((err, res) => {
-          expect(res.statusCode).to.eql(200);
-          expect(res.body).to.eql([expectAdminUser]);
-          done(err);
-        });
+        request
+          .get(`/users/${defaultId}`)
+          .set({ "x-access-token": authToken })
+          .end((err, res) => {
+            expect(res.statusCode).to.eql(200);
+            expect(res.body).to.eql([expectAdminUser]);
+            done(err);
+          });
       });
     });
   });
@@ -62,6 +70,7 @@ describe("Routes: Users", () => {
 
         request
           .post("/users")
+          .set({ "x-access-token": authToken })
           .send(newUser)
           .end((err, res) => {
             expect(res.statusCode).to.eql(201);
@@ -82,6 +91,7 @@ describe("Routes: Users", () => {
 
         request
           .put(`/users/${defaultId}`)
+          .set({ "x-access-token": authToken })
           .send(updatedUser)
           .end((err, res) => {
             expect(res.status).to.eql(200);
@@ -94,10 +104,44 @@ describe("Routes: Users", () => {
   describe("DELETE /users/:id", () => {
     context("when deleting an user", () => {
       it("should delete an user and return 204 as status code", (done) => {
-        request.delete(`/users/${defaultId}`).end((err, res) => {
-          expect(res.status).to.eql(204);
-          done(err);
-        });
+        request
+          .delete(`/users/${defaultId}`)
+          .set({ "x-access-token": authToken })
+          .end((err, res) => {
+            expect(res.status).to.eql(204);
+            done(err);
+          });
+      });
+    });
+  });
+
+  describe("POST /users/authenticate", () => {
+    context("when authenticating an user", () => {
+      it("should generate a valid tokent", (done) => {
+        request
+          .post("/users/authenticate")
+          .send({
+            email: "elon@gmail.com",
+            password: "123password",
+          })
+          .end((err, res) => {
+            expect(res.body).to.have.key("token");
+            expect(res.status).to.eql(200);
+            done(err);
+          });
+      });
+
+      it("should return unauthorized when the password does not match", (done) => {
+        request
+          .post(`/users/authenticate`)
+          .send({
+            email: "elon@gmail.com",
+            password: "wrongpassword",
+          })
+          .end((err, res) => {
+            expect(res.status).to.eql(401);
+            done(err);
+          });
       });
     });
   });
