@@ -20,9 +20,7 @@
 
 ### <strong>Funcionalidades da API:</strong>
 
-- [x] Criação, atualização, leitura e deleção de usuário
-- [x] Criação, atualização, leitura e deleção de produtos
-- [x] Somente Admins podem efetuar a criação e deleção de produtos
-- [x] Usuários podem efetuar a leitura de produtos
-- [x] Autenticação de usuário por JWT
-- [x] Sistema de autorização (Roles: Usuário e Admin)
+- [x] Funções CRUD (Create, Read, Update, Delete) para os models Products e User.
+- [x] Sistema de autorização ACL (Roles: Usuário e Admin).
+- [x] Autenticação de usuário por JWT.
+- [x] Testes Unitarios e de Integração(end 2 end) automatizados.
