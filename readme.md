@@ -24,5 +24,4 @@
 - [x] Sistema de autorização ACL (Roles: Usuário e Admin).
 - [x] Autenticação de usuário por JWT.
 - [x] Testes Unitarios e de Integração(end 2 end) automatizados.
-
 <img src="./github/thanksfw.png" min-width="400px" max-width="400px" width="400px" align="right" alt="header 2">
