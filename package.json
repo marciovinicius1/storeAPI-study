@@ -10,7 +10,12 @@
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": " NODE_ENV=test mocha --require @babel/register  --config=test/unit/.mocharc.json test/unit/**/*_spec.js",
     "test:integration": " NODE_ENV=test mocha --require @babel/register --config=test/integration/.mocharc.json test/integration/**/*_spec.js",
-    "dev": "nodemon babel-node src/server.js"
+    "dev": "nodemon babel-node src/server.js",
+    "lint": "eslint src --ext .js",
+    "lint:fix": "eslint src --fix --ext .js",
+    "prettier:list": "prettier --check 'src/**/*.js'",
+    "prettier:fix": "prettier --write 'src/**/*.js'",
+    "style:fix": "npm run lint:fix & npm run prettier:fix"
   },
   "keywords": [],
   "author": "",
@@ -29,9 +34,13 @@
     "@babel/preset-env": "^7.7.4",
     "@babel/register": "^7.18.6",
     "babel-cli": "^6.26.0",
+    "babel-eslint": "^10.1.0",
     "chai": "^4.3.6",
+    "eslint": "^8.21.0",
+    "eslint-plugin-node": "^11.1.0",
     "mocha": "^10.0.0",
     "nodemon": "^2.0.19",
+    "prettier": "^2.7.1",
     "sinon": "^14.0.0",
     "supertest": "^6.2.4"
   }
