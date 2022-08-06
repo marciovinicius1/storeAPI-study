@@ -1,35 +1,45 @@
-import setupApp from "./app.js";
-const port = 3000;
+import setupApp from './app.js'
+const port = 3000
 
-(async () => {
+;(async () => {
   try {
-    // promisse que inicializa o banco de dados e configura a aplicaçao
-    const app = await setupApp();
-    // inicializa o servidor na porta
+    /**
+     * promise that initializes the database and configures the application
+     */
+    const app = await setupApp()
+    /**
+     * initialize the server on port
+     */
     const server = app.listen(port, () =>
-      console.info(`⚡| Server is running on port ${port}!`)
-    );
-
-    // SIGINT => Interrupçao do sistema
-    //SIGTERM => finalizaçao do sistema (normamente utilizada)
-    //SIGQUIT => abandono, finalização forçada
-    const exitSignals = ["SIGINT", "SIGTERM", "SIGQUIT"];
+      console.info(`⚡| Server is running on port ${port}!`),
+    )
+    /**
+     * @params SIGINT   system interruption
+     * @params SIGTERM  system termination (commonly used)
+     * @params SIGQUIT  abandonment, forced termination
+     */
+    const exitSignals = ['SIGINT', 'SIGTERM', 'SIGQUIT']
     exitSignals.map((sig) =>
       process.on(sig, () =>
         server.close((err) => {
           if (err) {
-            console.error(err);
-            process.exit(1);
+            console.error(err)
+            process.exit(1)
           }
           app.database.connection.close(function () {
-            close.info("⛔| Database connection closed!");
-            process.exit(0);
-          });
-        })
-      )
-    );
+            close.info('⛔| Database connection closed!')
+            process.exit(0)
+          })
+        }),
+      ),
+    )
   } catch (error) {
-    console.error(error);
-    process.exit(1);
+    if (error) {
+      console.error(error)
+      process.exit(1)
+    } else {
+      return
+    }
   }
-})();
+})()
+
